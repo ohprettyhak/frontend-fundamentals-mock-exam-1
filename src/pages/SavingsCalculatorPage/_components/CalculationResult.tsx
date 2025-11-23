@@ -1,6 +1,6 @@
 import { Border, colors, ListHeader, ListRow, Spacing } from 'tosslib';
-import { INTEREST_RATE_FACTOR, RECOMMENDED_PRODUCT_COUNT, ROUNDING_UNIT } from '../constants/savings';
-import { SavingsProduct } from '../models/savings';
+import { INTEREST_RATE_FACTOR, RECOMMENDED_PRODUCT_COUNT, ROUNDING_UNIT } from '../_constants.ts';
+import { SavingsProduct } from '../../../apis';
 import { ProductList } from './ProductList';
 
 interface CalculationResultProps {

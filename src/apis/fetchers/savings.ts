@@ -1,4 +1,4 @@
-import { SavingsProduct } from '../models/savings';
+import { SavingsProduct } from '../types/savings.ts';
 
 export async function fetchSavingsProducts(): Promise<SavingsProduct[]> {
   const response = await fetch('/api/savings-products');

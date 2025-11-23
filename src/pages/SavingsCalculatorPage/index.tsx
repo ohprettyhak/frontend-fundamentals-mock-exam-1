@@ -1,12 +1,10 @@
 import { useSuspenseQuery } from '@tanstack/react-query';
 import { useState } from 'react';
 import { Border, NavigationBar, SelectBottomSheet, Spacing, Tab, TextField } from 'tosslib';
-import { fetchSavingsProducts } from '../apis/savings';
-import { CalculationResult } from '../components/CalculationResult';
-import { ProductList } from '../components/ProductList';
-import { useCurrencyInput } from '../hooks/useCurrencyInput';
-
-import { SavingsProduct } from '../models/savings';
+import { fetchSavingsProducts, type SavingsProduct } from '../../apis';
+import { CalculationResult } from './_components/CalculationResult';
+import { ProductList } from './_components/ProductList';
+import { useCurrencyInput } from '../../hooks/useCurrencyInput';
 
 export function SavingsCalculatorPage() {
   const { data: products } = useSuspenseQuery({

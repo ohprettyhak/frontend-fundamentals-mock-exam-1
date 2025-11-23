@@ -1,0 +1,1 @@
+export { fetchSavingsProducts } from './savings';

@@ -1,5 +1,5 @@
 import { Assets, colors, ListRow } from 'tosslib';
-import { SavingsProduct } from '../models/savings';
+import { SavingsProduct } from '../../../apis';
 
 interface ProductListProps {
   products: SavingsProduct[];
