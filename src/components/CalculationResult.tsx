@@ -1,4 +1,5 @@
 import { Border, colors, ListHeader, ListRow, Spacing } from 'tosslib';
+import { INTEREST_RATE_FACTOR, RECOMMENDED_PRODUCT_COUNT, ROUNDING_UNIT } from '../constants/savings';
 import { SavingsProduct } from '../models/savings';
 import { ProductList } from './ProductList';
 
@@ -23,12 +24,15 @@ export function CalculationResult({
     return <ListRow contents={<ListRow.Texts type="1RowTypeA" top="상품을 선택해주세요." />} />;
   }
 
-  const annualRate = selectedProduct.annualRate / 100;
-  const expectedTotalAmount = Math.floor(monthlyDeposit * term * (1 + annualRate * 0.5));
-  const differenceFromGoal = goalAmount - expectedTotalAmount;
-  const recommendedMonthlyDeposit = Math.round(goalAmount / (term * (1 + annualRate * 0.5)) / 1000) * 1000;
+  const 연_이자율 = selectedProduct.annualRate / 100;
+  const 예상_수익_금액 = Math.floor(monthlyDeposit * term * (1 + 연_이자율 * INTEREST_RATE_FACTOR));
+  const 목표_금액과의_차이 = goalAmount - 예상_수익_금액;
+  const 추천_월_납입_금액 =
+    Math.round(goalAmount / (term * (1 + 연_이자율 * INTEREST_RATE_FACTOR)) / ROUNDING_UNIT) * ROUNDING_UNIT;
 
-  const recommendedProducts = [...products].sort((a, b) => b.annualRate - a.annualRate).slice(0, 2);
+  const recommendedProducts = [...products]
+    .sort((a, b) => b.annualRate - a.annualRate)
+    .slice(0, RECOMMENDED_PRODUCT_COUNT);
 
   return (
     <>
@@ -38,7 +42,7 @@ export function CalculationResult({
             type="2RowTypeA"
             top="예상 수익 금액"
             topProps={{ color: colors.grey600 }}
-            bottom={`${expectedTotalAmount.toLocaleString()}원`}
+            bottom={`${예상_수익_금액.toLocaleString()} 원`}
             bottomProps={{ fontWeight: 'bold', color: colors.blue600 }}
           />
         }
@@ -49,7 +53,7 @@ export function CalculationResult({
             type="2RowTypeA"
             top="목표 금액과의 차이"
             topProps={{ color: colors.grey600 }}
-            bottom={`${differenceFromGoal.toLocaleString()}원`}
+            bottom={`${목표_금액과의_차이.toLocaleString()} 원`}
             bottomProps={{ fontWeight: 'bold', color: colors.blue600 }}
           />
         }
@@ -60,7 +64,7 @@ export function CalculationResult({
             type="2RowTypeA"
             top="추천 월 납입 금액"
             topProps={{ color: colors.grey600 }}
-            bottom={`${recommendedMonthlyDeposit.toLocaleString()}원`}
+            bottom={`${추천_월_납입_금액.toLocaleString()} 원`}
             bottomProps={{ fontWeight: 'bold', color: colors.blue600 }}
           />
         }

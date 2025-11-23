@@ -4,6 +4,7 @@ import { Border, NavigationBar, SelectBottomSheet, Spacing, Tab, TextField } fro
 import { fetchSavingsProducts } from '../apis/savings';
 import { CalculationResult } from '../components/CalculationResult';
 import { ProductList } from '../components/ProductList';
+import { useCurrencyInput } from '../hooks/useCurrencyInput';
 
 import { SavingsProduct } from '../models/savings';
 
@@ -13,14 +14,14 @@ export function SavingsCalculatorPage() {
     queryFn: fetchSavingsProducts,
   });
 
-  const [monthlyDeposit, setMonthlyDeposit] = useState<string>('');
+  const monthlyDepositInput = useCurrencyInput('');
+  const goalAmountInput = useCurrencyInput('');
   const [term, setTerm] = useState<number>(12);
   const [selectedProduct, setSelectedProduct] = useState<SavingsProduct | null>(null);
-  const [goalAmount, setGoalAmount] = useState<string>('');
   const [currentTab, setCurrentTab] = useState<string>('products');
 
   const filteredProducts = products.filter(product => {
-    const deposit = Number(monthlyDeposit.replace(/,/g, ''));
+    const deposit = monthlyDepositInput.numericValue;
     const isTermValid = product.availableTerms === term;
 
     if (deposit === 0) {
@@ -41,28 +42,16 @@ export function SavingsCalculatorPage() {
         label="목표 금액"
         placeholder="목표 금액을 입력하세요"
         suffix="원"
-        value={goalAmount}
-        onChange={e => {
-          const value = e.target.value.replace(/,/g, '');
-          if (isNaN(Number(value))) {
-            return;
-          }
-          setGoalAmount(Number(value).toLocaleString());
-        }}
+        value={goalAmountInput.value}
+        onChange={goalAmountInput.onChange}
       />
       <Spacing size={16} />
       <TextField
         label="월 납입액"
         placeholder="희망 월 납입액을 입력하세요"
         suffix="원"
-        value={monthlyDeposit}
-        onChange={e => {
-          const value = e.target.value.replace(/,/g, '');
-          if (isNaN(Number(value))) {
-            return;
-          }
-          setMonthlyDeposit(Number(value).toLocaleString());
-        }}
+        value={monthlyDepositInput.value}
+        onChange={monthlyDepositInput.onChange}
       />
       <Spacing size={16} />
       <SelectBottomSheet
@@ -94,9 +83,9 @@ export function SavingsCalculatorPage() {
       ) : (
         <CalculationResult
           selectedProduct={selectedProduct}
-          monthlyDeposit={Number(monthlyDeposit.replace(/,/g, ''))}
+          monthlyDeposit={monthlyDepositInput.numericValue}
           term={term}
-          goalAmount={Number(goalAmount.replace(/,/g, ''))}
+          goalAmount={goalAmountInput.numericValue}
           products={filteredProducts}
           onSelect={setSelectedProduct}
         />
