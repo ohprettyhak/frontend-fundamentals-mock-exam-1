@@ -2,6 +2,7 @@ import { useSuspenseQuery } from '@tanstack/react-query';
 import { useState } from 'react';
 import { Border, NavigationBar, SelectBottomSheet, Spacing, Tab, TextField } from 'tosslib';
 import { fetchSavingsProducts } from '../apis/savings';
+import { CalculationResult } from '../components/CalculationResult';
 import { ProductList } from '../components/ProductList';
 
 import { SavingsProduct } from '../models/savings';
@@ -15,6 +16,8 @@ export function SavingsCalculatorPage() {
   const [monthlyDeposit, setMonthlyDeposit] = useState<string>('');
   const [term, setTerm] = useState<number>(12);
   const [selectedProduct, setSelectedProduct] = useState<SavingsProduct | null>(null);
+  const [goalAmount, setGoalAmount] = useState<string>('');
+  const [currentTab, setCurrentTab] = useState<string>('products');
 
   const filteredProducts = products.filter(product => {
     const deposit = Number(monthlyDeposit.replace(/,/g, ''));
@@ -34,7 +37,19 @@ export function SavingsCalculatorPage() {
 
       <Spacing size={16} />
 
-      <TextField label="목표 금액" placeholder="목표 금액을 입력하세요" suffix="원" />
+      <TextField
+        label="목표 금액"
+        placeholder="목표 금액을 입력하세요"
+        suffix="원"
+        value={goalAmount}
+        onChange={e => {
+          const value = e.target.value.replace(/,/g, '');
+          if (isNaN(Number(value))) {
+            return;
+          }
+          setGoalAmount(Number(value).toLocaleString());
+        }}
+      />
       <Spacing size={16} />
       <TextField
         label="월 납입액"
@@ -65,16 +80,25 @@ export function SavingsCalculatorPage() {
       <Border height={16} />
       <Spacing size={8} />
 
-      <Tab onChange={() => {}}>
-        <Tab.Item value="products" selected={true}>
+      <Tab onChange={value => setCurrentTab(value)}>
+        <Tab.Item value="products" selected={currentTab === 'products'}>
           적금 상품
         </Tab.Item>
-        <Tab.Item value="results" selected={false}>
+        <Tab.Item value="results" selected={currentTab === 'results'}>
           계산 결과
         </Tab.Item>
       </Tab>
 
-      <ProductList products={filteredProducts} selectedProduct={selectedProduct} onSelect={setSelectedProduct} />
+      {currentTab === 'products' ? (
+        <ProductList products={filteredProducts} selectedProduct={selectedProduct} onSelect={setSelectedProduct} />
+      ) : (
+        <CalculationResult
+          selectedProduct={selectedProduct}
+          monthlyDeposit={Number(monthlyDeposit.replace(/,/g, ''))}
+          term={term}
+          goalAmount={Number(goalAmount.replace(/,/g, ''))}
+        />
+      )}
 
       {/* 아래는 계산 결과 탭 내용이에요. 계산 결과 탭을 구현할 때 주석을 해제해주세요. */}
       {/* <Spacing size={8} />
