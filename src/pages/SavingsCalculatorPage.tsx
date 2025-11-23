@@ -1,11 +1,28 @@
 import { useSuspenseQuery } from '@tanstack/react-query';
-import { Assets, Border, colors, ListRow, NavigationBar, SelectBottomSheet, Spacing, Tab, TextField } from 'tosslib';
+import { useState } from 'react';
+import { Border, NavigationBar, SelectBottomSheet, Spacing, Tab, TextField } from 'tosslib';
 import { fetchSavingsProducts } from '../apis/savings';
+import { ProductList } from '../components/ProductList';
 
 export function SavingsCalculatorPage() {
   const { data: products } = useSuspenseQuery({
     queryKey: ['savings-products'],
     queryFn: fetchSavingsProducts,
+  });
+
+  const [monthlyDeposit, setMonthlyDeposit] = useState<string>('');
+  const [term, setTerm] = useState<number>(12);
+
+  const filteredProducts = products.filter(product => {
+    const deposit = Number(monthlyDeposit.replace(/,/g, ''));
+    const isTermValid = product.availableTerms === term;
+
+    if (deposit === 0) {
+      return isTermValid;
+    }
+
+    const isDepositValid = deposit >= product.minMonthlyAmount && deposit <= product.maxMonthlyAmount;
+    return isDepositValid && isTermValid;
   });
 
   return (
@@ -16,9 +33,26 @@ export function SavingsCalculatorPage() {
 
       <TextField label="목표 금액" placeholder="목표 금액을 입력하세요" suffix="원" />
       <Spacing size={16} />
-      <TextField label="월 납입액" placeholder="희망 월 납입액을 입력하세요" suffix="원" />
+      <TextField
+        label="월 납입액"
+        placeholder="희망 월 납입액을 입력하세요"
+        suffix="원"
+        value={monthlyDeposit}
+        onChange={e => {
+          const value = e.target.value.replace(/,/g, '');
+          if (isNaN(Number(value))) {
+            return;
+          }
+          setMonthlyDeposit(Number(value).toLocaleString());
+        }}
+      />
       <Spacing size={16} />
-      <SelectBottomSheet label="저축 기간" title="저축 기간을 선택해주세요" value={12} onChange={() => {}}>
+      <SelectBottomSheet
+        label="저축 기간"
+        title="저축 기간을 선택해주세요"
+        value={term}
+        onChange={value => setTerm(value)}
+      >
         <SelectBottomSheet.Option value={6}>6개월</SelectBottomSheet.Option>
         <SelectBottomSheet.Option value={12}>12개월</SelectBottomSheet.Option>
         <SelectBottomSheet.Option value={24}>24개월</SelectBottomSheet.Option>
@@ -37,24 +71,7 @@ export function SavingsCalculatorPage() {
         </Tab.Item>
       </Tab>
 
-      {products.map(product => (
-        <ListRow
-          key={product.id}
-          contents={
-            <ListRow.Texts
-              type="3RowTypeA"
-              top={product.name}
-              topProps={{ fontSize: 16, fontWeight: 'bold', color: colors.grey900 }}
-              middle={`연 이자율: ${product.annualRate}%`}
-              middleProps={{ fontSize: 14, color: colors.blue600, fontWeight: 'medium' }}
-              bottom={`${product.minMonthlyAmount.toLocaleString()}원 ~ ${product.maxMonthlyAmount.toLocaleString()}원 | ${product.availableTerms}개월`}
-              bottomProps={{ fontSize: 13, color: colors.grey600 }}
-            />
-          }
-          right={product.id === 'savings-001' ? <Assets.Icon name="icon-check-circle-green" /> : undefined}
-          onClick={() => {}}
-        />
-      ))}
+      <ProductList products={filteredProducts} />
 
       {/* 아래는 계산 결과 탭 내용이에요. 계산 결과 탭을 구현할 때 주석을 해제해주세요. */}
       {/* <Spacing size={8} />
