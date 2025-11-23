@@ -1,9 +1,8 @@
 import { ErrorBoundary, Suspense } from '@suspensive/react';
 import { Border, ListRow, NavigationBar, SelectBottomSheet, Spacing, Tab, TextField } from 'tosslib';
 import { useSuspenseQuery } from '@tanstack/react-query';
-import { fetchSavingsProducts, type SavingsProduct } from '../../apis';
+import { fetchSavingsProducts } from '../../apis';
 import { useCurrencyInput } from '../../hooks/useCurrencyInput';
-import { useState } from 'react';
 import { SwitchCase } from 'react-simplikit';
 import { ProductList } from './_components/ProductList';
 import { CalculationResult } from './_components/CalculationResult';
@@ -23,17 +22,37 @@ export function SavingsCalculatorPage() {
   );
 }
 
+import { useSearchParams } from 'react-router-dom';
+
 export function SavingsCalculatorContent() {
   const { data: products } = useSuspenseQuery({
     queryKey: ['savings-products'],
     queryFn: fetchSavingsProducts,
   });
 
-  const monthlyDepositInput = useCurrencyInput('');
-  const goalAmountInput = useCurrencyInput('');
-  const [term, setTerm] = useState<number>(12);
-  const [selectedProduct, setSelectedProduct] = useState<SavingsProduct | null>(null);
-  const [currentTab, setCurrentTab] = useState<string>('products');
+  const [searchParams, setSearchParams] = useSearchParams();
+
+  const term = Number(searchParams.get('term')) || 12;
+  const currentTab = searchParams.get('tab') || 'products';
+  const productId = searchParams.get('productId');
+  const selectedProduct = products.find(p => p.id === productId) || null;
+
+  const monthlyDepositInput = useCurrencyInput(searchParams.get('monthlyDeposit') || '', value =>
+    updateParams('monthlyDeposit', value || null)
+  );
+  const goalAmountInput = useCurrencyInput(searchParams.get('goalAmount') || '', value =>
+    updateParams('goalAmount', value || null)
+  );
+
+  const updateParams = (key: string, value: string | number | null) => {
+    const newParams = new URLSearchParams(searchParams);
+    if (value === null || value === '') {
+      newParams.delete(key);
+    } else {
+      newParams.set(key, String(value));
+    }
+    setSearchParams(newParams, { replace: true });
+  };
 
   const filteredProducts = products.filter(product => {
     const deposit = monthlyDepositInput.numericValue;
@@ -73,7 +92,7 @@ export function SavingsCalculatorContent() {
         label="저축 기간"
         title="저축 기간을 선택해주세요"
         value={term}
-        onChange={value => setTerm(value)}
+        onChange={value => updateParams('term', value)}
       >
         <SelectBottomSheet.Option value={6}>6개월</SelectBottomSheet.Option>
         <SelectBottomSheet.Option value={12}>12개월</SelectBottomSheet.Option>
@@ -84,7 +103,7 @@ export function SavingsCalculatorContent() {
       <Border height={16} />
       <Spacing size={8} />
 
-      <Tab onChange={value => setCurrentTab(value)}>
+      <Tab onChange={value => updateParams('tab', value)}>
         <Tab.Item value="products" selected={currentTab === 'products'}>
           적금 상품
         </Tab.Item>
@@ -97,7 +116,11 @@ export function SavingsCalculatorContent() {
         value={currentTab}
         caseBy={{
           products: () => (
-            <ProductList products={filteredProducts} selectedProduct={selectedProduct} onSelect={setSelectedProduct} />
+            <ProductList
+              products={filteredProducts}
+              selectedProduct={selectedProduct}
+              onSelect={product => updateParams('productId', product.id)}
+            />
           ),
           results: () => (
             <CalculationResult
@@ -106,7 +129,7 @@ export function SavingsCalculatorContent() {
               term={term}
               goalAmount={goalAmountInput.numericValue}
               products={filteredProducts}
-              onSelect={setSelectedProduct}
+              onSelect={product => updateParams('productId', product.id)}
             />
           ),
         }}
