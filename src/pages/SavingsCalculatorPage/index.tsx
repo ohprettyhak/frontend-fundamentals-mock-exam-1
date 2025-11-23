@@ -1,12 +1,29 @@
+import { ErrorBoundary, Suspense } from '@suspensive/react';
+import { Border, ListRow, NavigationBar, SelectBottomSheet, Spacing, Tab, TextField } from 'tosslib';
 import { useSuspenseQuery } from '@tanstack/react-query';
-import { useState } from 'react';
-import { Border, NavigationBar, SelectBottomSheet, Spacing, Tab, TextField } from 'tosslib';
 import { fetchSavingsProducts, type SavingsProduct } from '../../apis';
-import { CalculationResult } from './_components/CalculationResult';
-import { ProductList } from './_components/ProductList';
 import { useCurrencyInput } from '../../hooks/useCurrencyInput';
+import { useState } from 'react';
+import { SwitchCase } from 'react-simplikit';
+import { ProductList } from './_components/ProductList';
+import { CalculationResult } from './_components/CalculationResult';
 
 export function SavingsCalculatorPage() {
+  return (
+    <ErrorBoundary
+      fallback={error => {
+        console.error(error);
+        return <ListRow contents={<ListRow.Texts type="1RowTypeA" top="에러가 발생했습니다." />} />;
+      }}
+    >
+      <Suspense fallback={<ListRow.Texts type="1RowTypeA" top="로딩 중..." />} clientOnly>
+        <SavingsCalculatorContent />
+      </Suspense>
+    </ErrorBoundary>
+  );
+}
+
+export function SavingsCalculatorContent() {
   const { data: products } = useSuspenseQuery({
     queryKey: ['savings-products'],
     queryFn: fetchSavingsProducts,
@@ -76,18 +93,25 @@ export function SavingsCalculatorPage() {
         </Tab.Item>
       </Tab>
 
-      {currentTab === 'products' ? (
-        <ProductList products={filteredProducts} selectedProduct={selectedProduct} onSelect={setSelectedProduct} />
-      ) : (
-        <CalculationResult
-          selectedProduct={selectedProduct}
-          monthlyDeposit={monthlyDepositInput.numericValue}
-          term={term}
-          goalAmount={goalAmountInput.numericValue}
-          products={filteredProducts}
-          onSelect={setSelectedProduct}
-        />
-      )}
+      <SwitchCase
+        value={currentTab}
+        caseBy={{
+          products: () => (
+            <ProductList products={filteredProducts} selectedProduct={selectedProduct} onSelect={setSelectedProduct} />
+          ),
+          results: () => (
+            <CalculationResult
+              selectedProduct={selectedProduct}
+              monthlyDeposit={monthlyDepositInput.numericValue}
+              term={term}
+              goalAmount={goalAmountInput.numericValue}
+              products={filteredProducts}
+              onSelect={setSelectedProduct}
+            />
+          ),
+        }}
+        defaultComponent={() => <ListRow.Texts type="1RowTypeA" top="탭을 선택해주세요." />}
+      />
     </>
   );
 }

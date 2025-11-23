@@ -1,6 +1,6 @@
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { GlobalPortal, GlobalStyles } from 'tosslib';
-import { Routes } from './Routes.tsx';
+import { Routes } from './Routes';
 
 export function App() {
   const queryClient = new QueryClient();

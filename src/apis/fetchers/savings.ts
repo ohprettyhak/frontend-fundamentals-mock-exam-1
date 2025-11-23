@@ -1,9 +1,13 @@
-import { SavingsProduct } from '../types/savings.ts';
+import { http, isHttpError } from 'tosslib';
+import { SavingsProduct } from '../types';
 
 export async function fetchSavingsProducts(): Promise<SavingsProduct[]> {
-  const response = await fetch('/api/savings-products');
-  if (!response.ok) {
-    throw new Error('Failed to fetch savings products');
+  try {
+    return await http.get<SavingsProduct[]>('/api/savings-products');
+  } catch (e) {
+    if (isHttpError(e)) {
+      console.log(e.message);
+    }
+    throw e;
   }
-  return response.json();
 }

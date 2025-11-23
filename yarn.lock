@@ -822,6 +822,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@suspensive/react@npm:^3.15.1":
+  version: 3.15.1
+  resolution: "@suspensive/react@npm:3.15.1"
+  peerDependencies:
+    react: ^18 || ^19
+  checksum: 10c0/be52da16a2bf825f5b135c12613048503318b3c8e41f5a1e6ef5d0a2fc15d148dbfe3547cc72cc0b0424cb76952c83d2f8f3bea4561358185bf468284d1b512a
+  languageName: node
+  linkType: hard
+
 "@swc/core-darwin-arm64@npm:1.15.3":
   version: 1.15.3
   resolution: "@swc/core-darwin-arm64@npm:1.15.3"
@@ -3696,6 +3705,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"react-simplikit@npm:^0.0.46":
+  version: 0.0.46
+  resolution: "react-simplikit@npm:0.0.46"
+  peerDependencies:
+    react: "*"
+  checksum: 10c0/f966f78845c4ff422d9c51cfa2fbab1be9314acbba3f9e4a469da1e8bba39b2a10ba54b8f634d4fa7b666f93378e2f96ae5a0a0bce97efaa197a22111a715808
+  languageName: node
+  linkType: hard
+
 "react@npm:^18":
   version: 18.3.1
   resolution: "react@npm:18.3.1"
@@ -4316,6 +4334,7 @@ __metadata:
     "@emotion/react": "npm:^11.14.0"
     "@emotion/styled": "npm:^11.14.0"
     "@hono/vite-dev-server": "npm:^0.18.0"
+    "@suspensive/react": "npm:^3.15.1"
     "@tanstack/react-query": "npm:^5.90.10"
     "@types/react": "npm:^18"
     "@types/react-dom": "npm:^18"
@@ -4333,6 +4352,7 @@ __metadata:
     react: "npm:^18"
     react-dom: "npm:^18"
     react-router-dom: "npm:^7.1.1"
+    react-simplikit: "npm:^0.0.46"
     tosslib: "file:./tosslib.tgz"
     typescript: "npm:~5.7.2"
     vite: "npm:^6.0.6"
