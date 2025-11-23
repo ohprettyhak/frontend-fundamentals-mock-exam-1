@@ -1,14 +1,24 @@
-import { colors, ListRow } from 'tosslib';
+import { Border, colors, ListHeader, ListRow, Spacing } from 'tosslib';
 import { SavingsProduct } from '../models/savings';
+import { ProductList } from './ProductList';
 
 interface CalculationResultProps {
   selectedProduct: SavingsProduct | null;
   monthlyDeposit: number;
   term: number;
   goalAmount: number;
+  products: SavingsProduct[];
+  onSelect: (product: SavingsProduct) => void;
 }
 
-export function CalculationResult({ selectedProduct, monthlyDeposit, term, goalAmount }: CalculationResultProps) {
+export function CalculationResult({
+  selectedProduct,
+  monthlyDeposit,
+  term,
+  goalAmount,
+  products,
+  onSelect,
+}: CalculationResultProps) {
   if (!selectedProduct) {
     return <ListRow contents={<ListRow.Texts type="1RowTypeA" top="상품을 선택해주세요." />} />;
   }
@@ -17,6 +27,8 @@ export function CalculationResult({ selectedProduct, monthlyDeposit, term, goalA
   const expectedTotalAmount = Math.floor(monthlyDeposit * term * (1 + annualRate * 0.5));
   const differenceFromGoal = goalAmount - expectedTotalAmount;
   const recommendedMonthlyDeposit = Math.round(goalAmount / (term * (1 + annualRate * 0.5)) / 1000) * 1000;
+
+  const recommendedProducts = [...products].sort((a, b) => b.annualRate - a.annualRate).slice(0, 2);
 
   return (
     <>
@@ -53,6 +65,15 @@ export function CalculationResult({ selectedProduct, monthlyDeposit, term, goalA
           />
         }
       />
+
+      <Spacing size={8} />
+      <Border height={16} />
+      <Spacing size={8} />
+
+      <ListHeader title={<ListHeader.TitleParagraph fontWeight="bold">추천 상품 목록</ListHeader.TitleParagraph>} />
+      <Spacing size={12} />
+
+      <ProductList products={recommendedProducts} selectedProduct={selectedProduct} onSelect={onSelect} />
     </>
   );
 }
