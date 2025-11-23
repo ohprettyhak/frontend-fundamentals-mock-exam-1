@@ -3,9 +3,11 @@ import { SavingsProduct } from '../models/savings';
 
 interface ProductListProps {
   products: SavingsProduct[];
+  selectedProduct: SavingsProduct | null;
+  onSelect: (product: SavingsProduct) => void;
 }
 
-export function ProductList({ products }: ProductListProps) {
+export function ProductList({ products, selectedProduct, onSelect }: ProductListProps) {
   return (
     <>
       {products.map(product => (
@@ -22,8 +24,8 @@ export function ProductList({ products }: ProductListProps) {
               bottomProps={{ fontSize: 13, color: colors.grey600 }}
             />
           }
-          right={product.id === 'savings-001' ? <Assets.Icon name="icon-check-circle-green" /> : undefined}
-          onClick={() => {}}
+          right={selectedProduct?.id === product.id ? <Assets.Icon name="icon-check-circle-green" /> : undefined}
+          onClick={() => onSelect(product)}
         />
       ))}
     </>

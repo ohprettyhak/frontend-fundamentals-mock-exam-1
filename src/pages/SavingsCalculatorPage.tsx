@@ -4,6 +4,8 @@ import { Border, NavigationBar, SelectBottomSheet, Spacing, Tab, TextField } fro
 import { fetchSavingsProducts } from '../apis/savings';
 import { ProductList } from '../components/ProductList';
 
+import { SavingsProduct } from '../models/savings';
+
 export function SavingsCalculatorPage() {
   const { data: products } = useSuspenseQuery({
     queryKey: ['savings-products'],
@@ -12,6 +14,7 @@ export function SavingsCalculatorPage() {
 
   const [monthlyDeposit, setMonthlyDeposit] = useState<string>('');
   const [term, setTerm] = useState<number>(12);
+  const [selectedProduct, setSelectedProduct] = useState<SavingsProduct | null>(null);
 
   const filteredProducts = products.filter(product => {
     const deposit = Number(monthlyDeposit.replace(/,/g, ''));
@@ -71,7 +74,7 @@ export function SavingsCalculatorPage() {
         </Tab.Item>
       </Tab>
 
-      <ProductList products={filteredProducts} />
+      <ProductList products={filteredProducts} selectedProduct={selectedProduct} onSelect={setSelectedProduct} />
 
       {/* 아래는 계산 결과 탭 내용이에요. 계산 결과 탭을 구현할 때 주석을 해제해주세요. */}
       {/* <Spacing size={8} />
